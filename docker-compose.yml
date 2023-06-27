@@ -56,7 +56,7 @@ services:
     user: root
     volumes:
       - grafana-agent_data:/etc/agent/data
-      
+
       - ./entrypoint.sh:/entrypoint.sh
       - ./custom-prom.yml:/custom-prom.yml
       - ./custom-lokiurl.yml:/custom-lokiurl.yml
@@ -69,12 +69,12 @@ services:
 
       - /etc/machine-id:/etc/machine-id:ro
 
-      - /var/log:/var/log:ro,rslave
-      - /mnt/docker/data/docker/containers:/var/lib/docker/containers:ro,rslave
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
 
-      - /:/host/root:ro,rslave
-      - /sys:/host/sys:ro,rslave
-      - /proc:/host/proc:ro,rslave
+      - /:/host/root:ro
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
     entrypoint: ./entrypoint.sh
     command: ["/bin/grafana-agent"]
     environment:
