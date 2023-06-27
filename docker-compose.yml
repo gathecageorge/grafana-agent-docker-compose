@@ -1,0 +1,81 @@
+version: "3.9"
+
+x-logging: &logging
+  logging:
+    driver: 'json-file'
+    options: 
+      tag: '{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}'
+
+volumes:
+  grafana-agent_data: {}
+  prometheus_data: {}
+  loki_data: {}
+  grafana_data: {}
+
+services:
+  prometheus:
+    <<: *logging
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus-config.yml:/etc/prometheus/config.yml
+    command:
+      - '--config.file=/etc/prometheus/config.yml'
+      - '--enable-feature=remote-write-receiver'
+
+  loki:
+    <<: *logging
+    image: grafana/loki:latest
+    volumes:
+      - loki_data:/tmp
+      - ./loki-config.yml:/etc/loki/config.yml
+    command:
+      - '--config.file=/etc/loki/config.yml'
+
+  grafana:
+    <<: *logging
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SERVER_DOMAIN=localhost
+      - GF_SERVER_ROOT_URL=%(protocol)s://localhost
+      # - GF_SECURITY_ADMIN_USER=myadmin
+      # - GF_SECURITY_ADMIN_PASSWORD=mypass
+      # - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+    ports:
+      - 3001:3000
+
+  grafana-agent:
+    <<: *logging
+    image: grafana/agent:latest
+    user: root
+    volumes:
+      - grafana-agent_data:/etc/agent/data
+      
+      - ./entrypoint.sh:/entrypoint.sh
+      - ./custom-prom.yml:/custom-prom.yml
+      - ./custom-lokiurl.yml:/custom-lokiurl.yml
+
+      - ./agent-global-config.yml:/agent-global-config.yml
+      - ./agent-intergrations-config.yml:/agent-intergrations-config.yml
+      - ./agent-prometheus-config.yml:/agent-prometheus-config.yml
+      - ./agent-promtail-config.yml:/agent-promtail-config.yml
+      - ./agent-traces-config.yml:/agent-traces-config.yml
+
+      - /etc/machine-id:/etc/machine-id:ro
+
+      - /var/log:/var/log:ro,rslave
+      - /mnt/docker/data/docker/containers:/var/lib/docker/containers:ro,rslave
+
+      - /:/host/root:ro,rslave
+      - /sys:/host/sys:ro,rslave
+      - /proc:/host/proc:ro,rslave
+    entrypoint: ./entrypoint.sh
+    command: ["/bin/grafana-agent"]
+    environment:
+      SERVER_LABEL_HOSTNAME: ${SERVER_LABEL_HOSTNAME:-notset}

@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 1m
+  external_labels:
+    cluster: georgelocalhost
+    environment: chainlink
+
+  remote_write:
+    - url: http://prometheus:9090/api/v1/write
+      # headers:
+      #   "CF-Access-Client-Id": "SS.access"
+      #   "CF-Access-Client-Secret": "SS"
+      #   "X-Scope-OrgID": "primary"
