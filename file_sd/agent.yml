@@ -1,0 +1,5 @@
+- labels:
+    appname: grafana-agent
+    instance: grafana-agent
+  targets:
+  - localhost:12345

@@ -60,6 +60,7 @@ services:
       - ./entrypoint.sh:/entrypoint.sh
       - ./custom-prom.yml:/custom-prom.yml
       - ./custom-lokiurl.yml:/custom-lokiurl.yml
+      - ./file_sd:/etc/prometheus/file_sd
 
       - ./agent-global-config.yml:/agent-global-config.yml
       - ./agent-intergrations-config.yml:/agent-intergrations-config.yml
@@ -70,7 +71,7 @@ services:
       - /etc/machine-id:/etc/machine-id:ro
 
       - /var/log:/var/log:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ${DOCKER_CONTAINER_LOGS_PATH:-/var/lib/docker/containers}:/var/lib/docker/containers:ro
 
       - /:/host/root:ro
       - /sys:/host/sys:ro
