@@ -39,16 +39,10 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:
-      - GF_SERVER_DOMAIN=localhost
-      - GF_SERVER_ROOT_URL=%(protocol)s://localhost
-      # - GF_SECURITY_ADMIN_USER=myadmin
-      # - GF_SECURITY_ADMIN_PASSWORD=mypass
-      # - GF_USERS_ALLOW_SIGN_UP=false
       - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     ports:
-      - 3001:3000
+      - 3000:3000
 
   grafana-agent:
     <<: *logging
@@ -57,16 +51,16 @@ services:
     volumes:
       - grafana-agent_data:/etc/agent/data
 
-      - ./entrypoint.sh:/entrypoint.sh
-      - ./custom-prom.yml:/custom-prom.yml
-      - ./custom-lokiurl.yml:/custom-lokiurl.yml
-      - ./file_sd:/etc/prometheus/file_sd
+      - ./grafana-agent/entrypoint.sh:/configs/entrypoint.sh
+      - ./grafana-agent/prometheus-custom.yml:/configs/prometheus-custom.yml
+      - ./grafana-agent/promtail-lokiurl.yml:/configs/promtail-lokiurl.yml
+      - ./grafana-agent/file_sd:/etc/prometheus/file_sd
 
-      - ./agent-global-config.yml:/agent-global-config.yml
-      - ./agent-intergrations-config.yml:/agent-intergrations-config.yml
-      - ./agent-prometheus-config.yml:/agent-prometheus-config.yml
-      - ./agent-promtail-config.yml:/agent-promtail-config.yml
-      - ./agent-traces-config.yml:/agent-traces-config.yml
+      - ./grafana-agent/global.yml:/configs/global.yml
+      - ./grafana-agent/intergrations.yml:/configs/intergrations.yml
+      - ./grafana-agent/prometheus.yml:/configs/prometheus.yml
+      - ./grafana-agent/promtail.yml:/configs/promtail.yml
+      - ./grafana-agent/traces.yml:/configs/traces.yml
 
       - /etc/machine-id:/etc/machine-id:ro
 
@@ -76,7 +70,7 @@ services:
       - /:/host/root:ro
       - /sys:/host/sys:ro
       - /proc:/host/proc:ro
-    entrypoint: ./entrypoint.sh
+    entrypoint: ./configs/entrypoint.sh
     command: ["/bin/grafana-agent"]
     environment:
       SERVER_LABEL_HOSTNAME: ${SERVER_LABEL_HOSTNAME:-notset}

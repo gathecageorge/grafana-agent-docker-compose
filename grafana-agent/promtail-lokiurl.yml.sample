@@ -1,0 +1,6 @@
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+#     headers:
+#       "CF-Access-Client-Id": "SS.access"
+#       "CF-Access-Client-Secret": "SS"
+#       "X-Scope-OrgID": "primary"

@@ -1,1 +1,4 @@
 .env
+grafana-agent/agent.yml
+grafana-agent/prometheus-custom.yml
+grafana-agent/promtail-lokiurl.yml

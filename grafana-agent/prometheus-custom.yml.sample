@@ -1,0 +1,9 @@
+global:
+  external_labels:
+    server: test-server
+
+  remote_write:
+    - url: http://prometheus:9090/api/v1/write
+  #     basic_auth:
+  #       username: <Your Metrics instance ID>
+  #       password: <Your Grafana.com API Key>
